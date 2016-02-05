@@ -2,7 +2,7 @@
 ### Launch Redis
 
 ``` console
-($ docker-machine create dev --provider virtualbox)
+($ docker-machine create dev --provider virtualbox) <-- unless docker machine is set up
 $ docker run -d --name redis -p 6379:6379 redis
 $ docker-machine ssh dev -f -N -L 6379:localhost:6379
 ```
@@ -230,3 +230,137 @@ $ jar -u0vf spring-cloud-dataflow-admin-local-1.0.0.M2.jar lib
 
 
 ![image](https://cloud.githubusercontent.com/assets/106908/12848884/d17d7dd4-cc5f-11e5-9494-da678bb203b0.png)
+
+
+### Deploy Admin on Cloud Foundry
+
+Download Admin UI for Clound Foundry.
+
+``` console
+$ wget http://repo.spring.io/milestone/org/springframework/cloud/spring-cloud-dataflow-admin-cloudfoundry/1.0.0.M1/spring-cloud-dataflow-admin-cloudfoundry-1.0.0.M1.jar
+($ jar -u0vf spring-cloud-dataflow-admin-cloudfoundry-1.0.0.M1.ja lib) <-- if needed
+```
+
+Create a Redis service.
+
+``` console
+$ cf create-service rediscloud 30mb scdf-redis
+($ cf create-service p-redis shared-vm scdf-redis) <-- in case of PCF
+```
+
+Deploy Admin UI.
+
+``` console
+$ cf push scdf-admn -p spring-cloud-dataflow-admin-cloudfoundry-1.0.0.M1.jar --no-start
+$ cf bind-service scdf-admn scdf-redis
+$ cf set-env scdf-admn CLOUDFOUNDRY_API_ENDPOINT https://api.run.pivotal.io
+$ cf set-env scdf-admn CLOUDFOUNDRY_ORGANIZATION {org}
+$ cf set-env scdf-admn CLOUDFOUNDRY_SPACE {space}
+$ cf set-env scdf-admn CLOUDFOUNDRY_DOMAIN cfapps.io
+$ cf set-env scdf-admn CLOUDFOUNDRY_SERVICES scdf-redis
+$ cf set-env scdf-admn CLOUDFOUNDRY_USERNAME {email}
+$ cf set-env scdf-admn CLOUDFOUNDRY_PASSWORD {password}
+$ cf set-env scdf-admn CLOUDFOUNDRY_SKIP_SSL_VALIDATION false
+$ cf start scdf-admn
+```
+
+Access from shell
+
+``` console
+server-unknown:>admin config server http://scdf-admn.cfapps.io
+Successfully targeted http://scdf-admn.cfapps.io
+```
+
+Create a stream.
+
+```
+dataflow:>stream create --name ticktock-foo --definition "time | log" --deploy
+Created and deployed new stream 'ticktock-foo'
+dataflow:>stream list
+╔════════════╤═════════════════╤════════╗
+║Stream Name │Stream Definition│ Status ║
+╠════════════╪═════════════════╪════════╣
+║ticktock-foo│time | log       │deployed║
+╚════════════╧═════════════════╧════════╝
+
+dataflow:>runtime modules 
+╔═══════════════════════╤═══════════╤══════════════════════════════════════════════════════╗
+║Module Id / Instance Id│Unit Status│            No. of Instances / Attributes             ║
+╠═══════════════════════╪═══════════╪══════════════════════════════════════════════════════╣
+║ticktock-foo.log       │ deployed  │                          1                           ║
+╟┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┼┈┈┈┈┈┈┈┈┈┈┈┼┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈╢
+║                       │           │        uris = ticktock-foo-log.cfapps.io             ║
+║                       │           │   mem_quota = 1073741824                             ║
+║                       │           │        port = 60190                                  ║
+║                       │           │   usage.cpu = 0.5938522143670757                     ║
+║                       │           │        name = ticktock-foo-log                       ║
+║ticktock-foo-log:0     │ deployed  │        host = 192.168.8.245                          ║
+║                       │           │  usage.disk = 190390272                              ║
+║                       │           │  disk_quota = 1073741824                             ║
+║                       │           │   fds_quota = 16384                                  ║
+║                       │           │usage.memory = 517173248                              ║
+║                       │           │      uptime = 42.0                                   ║
+╟───────────────────────┼───────────┼──────────────────────────────────────────────────────╢
+║ticktock-foo.time      │ deployed  │                          1                           ║
+╟┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┼┈┈┈┈┈┈┈┈┈┈┈┼┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈╢
+║                       │           │        uris = ticktock-foo-time.cfapps.io            ║
+║                       │           │   mem_quota = 1073741824                             ║
+║                       │           │        port = 61217                                  ║
+║                       │           │   usage.cpu = 0.1667436182651442                     ║
+║                       │           │        name = ticktock-foo-time                      ║
+║ticktock-foo-time:0    │ deployed  │        host = 192.168.9.3                            ║
+║                       │           │  usage.disk = 192929792                              ║
+║                       │           │  disk_quota = 1073741824                             ║
+║                       │           │   fds_quota = 16384                                  ║
+║                       │           │usage.memory = 519127040                              ║
+║                       │           │      uptime = 33.0                                   ║
+╚═══════════════════════╧═══════════╧══════════════════════════════════════════════════════╝
+```
+
+
+``` console
+$ cf apps
+
+name                requested state   instances   memory   disk   urls   
+scdf-admn           started           1/1         1G       1G     scdf-admn.cfapps.pez.io   
+ticktock-foo-log    started           1/1         1G       1G     ticktock-foo-log.cfapps.io   
+ticktock-foo-time   started           1/1         1G       1G     ticktock-foo-time.cfapps.io 
+
+$ cf logs ticktock-foo-log
+
+2016-02-06T01:09:24.51+0900 [APP/0]      OUT 2016-02-05 16:09:24.517  INFO 15 --- [hannel-adapter1] log.sink                                 : 2016-02-05 16:09:24
+2016-02-06T01:09:25.51+0900 [APP/0]      OUT 2016-02-05 16:09:25.518  INFO 15 --- [hannel-adapter1] log.sink                                 : 2016-02-05 16:09:25
+2016-02-06T01:09:26.51+0900 [APP/0]      OUT 2016-02-05 16:09:26.519  INFO 15 --- [hannel-adapter1] log.sink                                 : 2016-02-05 16:09:26
+2016-02-06T01:09:27.52+0900 [APP/0]      OUT 2016-02-05 16:09:27.520  INFO 15 --- [hannel-adapter1] log.sink                                 : 2016-02-05 16:09:27
+2016-02-06T01:09:28.52+0900 [APP/0]      OUT 2016-02-05 16:09:28.521  INFO 15 --- [hannel-adapter1] log.sink                                 : 2016-02-05 16:09:28
+```
+
+Note that stream name seems to have to be unique in the same domain. Otherwise 400 error will return as follows:
+
+``` console
+dataflow:>stream create --name ticktock --definition "time | log" --deploy
+Command failed org.springframework.cloud.dataflow.rest.client.DataFlowClientException: 400 Bad Request
+
+400 Bad Request
+
+org.springframework.cloud.dataflow.rest.client.DataFlowClientException: 400 Bad Request
+
+    at org.springframework.cloud.dataflow.rest.client.VndErrorResponseErrorHandler.handleError(VndErrorResponseErrorHandler.java:52)
+    at org.springframework.web.client.RestTemplate.handleResponse(RestTemplate.java:641)
+    at org.springframework.web.client.RestTemplate.doExecute(RestTemplate.java:597)
+    at org.springframework.web.client.RestTemplate.execute(RestTemplate.java:557)
+    at org.springframework.web.client.RestTemplate.postForObject(RestTemplate.java:357)
+    at org.springframework.cloud.dataflow.rest.client.StreamTemplate.createStream(StreamTemplate.java:79)
+    at org.springframework.cloud.dataflow.shell.command.StreamCommands.createStream(StreamCommands.java:99)
+    at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+    at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+    at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+    at java.lang.reflect.Method.invoke(Method.java:497)
+    at org.springframework.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:216)
+    at org.springframework.shell.core.SimpleExecutionStrategy.invoke(SimpleExecutionStrategy.java:64)
+    at org.springframework.shell.core.SimpleExecutionStrategy.execute(SimpleExecutionStrategy.java:57)
+    at org.springframework.shell.core.AbstractShell.executeCommand(AbstractShell.java:130)
+    at org.springframework.shell.core.JLineShell.promptLoop(JLineShell.java:533)
+    at org.springframework.shell.core.JLineShell.run(JLineShell.java:179)
+    at java.lang.Thread.run(Thread.java:745)
+```
