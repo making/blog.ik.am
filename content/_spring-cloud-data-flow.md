@@ -115,3 +115,66 @@ $ jps
 ![image](https://cloud.githubusercontent.com/assets/106908/12841206/757e2132-cc2d-11e5-8762-e60dfd244fcd.png)
 
 ![image](https://cloud.githubusercontent.com/assets/106908/12841226/93e0dba6-cc2d-11e5-8f99-dac5847a6f49.png)
+
+### Use Modules
+
+``` console
+dataflow:>module list
+╔══════════════╤════════════════╤═══════════════════╤════╗
+║    source    │   processor    │       sink        │task║
+╠══════════════╪════════════════╪═══════════════════╪════╣
+║file          │filter          │cassandra          │    ║
+║ftp           │groovy-filter   │counter            │    ║
+║http          │groovy-transform│field-value-counter│    ║
+║load-generator│httpclient      │file               │    ║
+║sftp          │noop            │ftp                │    ║
+║tcp           │pmml            │gemfire            │    ║
+║time          │splitter        │hdfs               │    ║
+║twitterstream │transform       │jdbc               │    ║
+║              │                │log                │    ║
+║              │                │redis              │    ║
+║              │                │tcp                │    ║
+║              │                │throughput         │    ║
+║              │                │websocket          │    ║
+╚══════════════╧════════════════╧═══════════════════╧════╝
+```
+
+Let's use `http` as source and `file` as sink!
+
+``` console
+dataflow:>stream create --name demo --definition "http --server.port=9000 | file --directory=/tmp/out" --deploy
+Created and deployed new stream 'demo'
+dataflow:>runtime modules 
+╔═══════════════════════╤═══════════╤════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+║Module Id / Instance Id│Unit Status│                                                 No. of Instances / Attributes                                                  ║
+╠═══════════════════════╪═══════════╪════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╣
+║demo.file              │ deployed  │                                                               1                                                                ║
+╟┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┼┈┈┈┈┈┈┈┈┈┈┈┼┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈╢
+║                       │           │working.dir = /var/folders/15/fww24j3d7pg9sz196cxv_6xm4nvlh8/T/spring-cloud-data-flow-4734634153643730467/demo.file             ║
+║demo.file-0            │ deployed  │     stdout = /var/folders/15/fww24j3d7pg9sz196cxv_6xm4nvlh8/T/spring-cloud-data-flow-4734634153643730467/demo.file/stdout_0.log║
+║                       │           │     stderr = /var/folders/15/fww24j3d7pg9sz196cxv_6xm4nvlh8/T/spring-cloud-data-flow-4734634153643730467/demo.file/stderr_0.log║
+║                       │           │        url = http://192.168.16.82:65385                                                                                        ║
+╟───────────────────────┼───────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╢
+║demo.http              │ deployed  │                                                               1                                                                ║
+╟┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┼┈┈┈┈┈┈┈┈┈┈┈┼┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈╢
+║                       │           │working.dir = /var/folders/15/fww24j3d7pg9sz196cxv_6xm4nvlh8/T/spring-cloud-data-flow-4734634153643730467/demo.http             ║
+║demo.http-0            │ deployed  │     stdout = /var/folders/15/fww24j3d7pg9sz196cxv_6xm4nvlh8/T/spring-cloud-data-flow-4734634153643730467/demo.http/stdout_0.log║
+║                       │           │     stderr = /var/folders/15/fww24j3d7pg9sz196cxv_6xm4nvlh8/T/spring-cloud-data-flow-4734634153643730467/demo.http/stderr_0.log║
+║                       │           │        url = http://192.168.16.82:9000                                                                                         ║
+╚═══════════════════════╧═══════════╧════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+```
+
+Access 
+
+``` console
+$ curl -X POST -d "Hello World1" -H "Content-Type: text/plain" localhost:9000
+$ curl -X POST -d "Hello World2" -H "Content-Type: text/plain" localhost:9000
+$ curl -X POST -d "Hello World3" -H "Content-Type: text/plain" localhost:9000
+```
+
+``` console
+$ tail -f /tmp/out/file-sink 
+Hello World1
+Hello World2
+Hello World3
+```
