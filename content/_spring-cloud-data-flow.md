@@ -364,3 +364,68 @@ org.springframework.cloud.dataflow.rest.client.DataFlowClientException: 400 Bad 
     at org.springframework.shell.core.JLineShell.run(JLineShell.java:179)
     at java.lang.Thread.run(Thread.java:745)
 ```
+
+Easy to scale.
+
+``` console
+dataflow:>! cf scale ticktock-foo-time -i 2
+command is:cf scale ticktock-foo-time -i 2
+OK
+dataflow:>runtime modules 
+╔═══════════════════════╤═══════════╤══════════════════════════════════════════════════════╗
+║Module Id / Instance Id│Unit Status│            No. of Instances / Attributes             ║
+╠═══════════════════════╪═══════════╪══════════════════════════════════════════════════════╣
+║ticktock-foo.log       │ deployed  │                          1                           ║
+╟┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┼┈┈┈┈┈┈┈┈┈┈┈┼┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈╢
+║                       │           │        uris = ticktock-foo-log.cfapps.io             ║
+║                       │           │   mem_quota = 1073741824                             ║
+║                       │           │        port = 60190                                  ║
+║                       │           │   usage.cpu = 0.006389596662362231                   ║
+║                       │           │        name = ticktock-foo-log                       ║
+║ticktock-foo-log:0     │ deployed  │        host = 192.168.8.245                          ║
+║                       │           │  usage.disk = 190390272                              ║
+║                       │           │  disk_quota = 1073741824                             ║
+║                       │           │   fds_quota = 16384                                  ║
+║                       │           │usage.memory = 520814592                              ║
+║                       │           │      uptime = 1039.0                                 ║
+╟───────────────────────┼───────────┼──────────────────────────────────────────────────────╢
+║ticktock-foo.time      │ deploying │                          2                           ║
+╟┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┼┈┈┈┈┈┈┈┈┈┈┈┼┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈╢
+║                       │           │        uris = ticktock-foo-time.cfapps.io            ║
+║                       │           │   mem_quota = 1073741824                             ║
+║                       │           │        port = 61217                                  ║
+║                       │           │   usage.cpu = 0.0023093344768086326                  ║
+║                       │           │        name = ticktock-foo-time                      ║
+║ticktock-foo-time:0    │ deployed  │        host = 192.168.9.3                            ║
+║                       │           │  usage.disk = 192929792                              ║
+║                       │           │  disk_quota = 1073741824                             ║
+║                       │           │   fds_quota = 16384                                  ║
+║                       │           │usage.memory = 520687616                              ║
+║                       │           │      uptime = 1030.0                                 ║
+╟┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┼┈┈┈┈┈┈┈┈┈┈┈┼┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈╢
+║                       │           │  usage.time = 2016-02-05 16:23:55                    ║
+║                       │           │        uris = ticktock-foo-time.cfapps.io            ║
+║                       │           │   mem_quota = 1073741824                             ║
+║                       │           │        port = 0                                      ║
+║                       │           │   usage.cpu = 0.0                                    ║
+║ticktock-foo-time:1    │ deploying │        name = ticktock-foo-time                      ║
+║                       │           │        host = null                                   ║
+║                       │           │  usage.disk = 0                                      ║
+║                       │           │  disk_quota = 1073741824                             ║
+║                       │           │   fds_quota = 16384                                  ║
+║                       │           │usage.memory = 0                                      ║
+║                       │           │      uptime = 8.0                                    ║
+╚═══════════════════════╧═══════════╧══════════════════════════════════════════════════════╝
+```
+
+``` console
+$ cf logs ticktock-foo-log
+2016-02-06T01:26:02.95+0900 [APP/0]      OUT 2016-02-05 16:26:02.957  INFO 15 --- [hannel-adapter1] log.sink                                 : 2016-02-05 16:26:03
+2016-02-06T01:26:03.49+0900 [APP/0]      OUT 2016-02-05 16:26:03.495  INFO 15 --- [hannel-adapter1] log.sink                                 : 2016-02-05 16:26:03
+2016-02-06T01:26:03.95+0900 [APP/0]      OUT 2016-02-05 16:26:03.958  INFO 15 --- [hannel-adapter1] log.sink                                 : 2016-02-05 16:26:04
+2016-02-06T01:26:04.49+0900 [APP/0]      OUT 2016-02-05 16:26:04.496  INFO 15 --- [hannel-adapter1] log.sink                                 : 2016-02-05 16:26:04
+2016-02-06T01:26:04.95+0900 [APP/0]      OUT 2016-02-05 16:26:04.959  INFO 15 --- [hannel-adapter1] log.sink                                 : 2016-02-05 16:26:05
+2016-02-06T01:26:05.49+0900 [APP/0]      OUT 2016-02-05 16:26:05.497  INFO 15 --- [hannel-adapter1] log.sink                                 : 2016-02-05 16:26:05
+2016-02-06T01:26:05.96+0900 [APP/0]      OUT 2016-02-05 16:26:05.960  INFO 15 --- [hannel-adapter1] log.sink                                 : 2016-02-05 16:26:06
+2016-02-06T01:26:06.09+0900 [HEALTH/0]   OUT healthcheck passed
+```
