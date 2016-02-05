@@ -116,6 +116,12 @@ $ jps
 
 ![image](https://cloud.githubusercontent.com/assets/106908/12841226/93e0dba6-cc2d-11e5-8f99-dac5847a6f49.png)
 
+
+``` console
+dataflow:>stream destroy ticktock
+Destroyed stream 'ticktock'
+```
+
 ### Use Modules
 
 ``` console
@@ -181,6 +187,8 @@ Hello World3
 
 
 ``` console
+dataflow:>stream destroy demo
+Destroyed stream 'demo'
 dataflow:>stream create --name demo --definition "http --server.port=9000 | transform --expression=payload.toUpperCase() | file --directory=/tmp/out" --deploy
 Created and deployed new stream 'demo'
 ```
