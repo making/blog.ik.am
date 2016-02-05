@@ -322,7 +322,7 @@ dataflow:>runtime modules
 $ cf apps
 
 name                requested state   instances   memory   disk   urls   
-scdf-admn           started           1/1         1G       1G     scdf-admn.cfapps.pez.io   
+scdf-admn           started           1/1         1G       1G     scdf-admn.cfapps.io   
 ticktock-foo-log    started           1/1         1G       1G     ticktock-foo-log.cfapps.io   
 ticktock-foo-time   started           1/1         1G       1G     ticktock-foo-time.cfapps.io 
 
