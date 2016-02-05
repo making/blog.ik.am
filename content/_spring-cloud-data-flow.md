@@ -205,3 +205,28 @@ HELLO WORLD1
 HELLO WORLD2
 HELLO WORLD3
 ```
+
+### Use Flo for Spring Cloud Data Flow
+
+https://network.pivotal.io/products/p-flo-for-spring-cloud-data-flow
+
+
+How to install is described in [this doc](http://docs.pivotal.io/spring-cloud-data-flow/index.html).
+
+Download `flo-spring-cloud-dataflow-admin-1.0.0.M1.zip` on the same directory as `spring-cloud-dataflow-admin-local-1.0.0.M2.jar `.
+
+``` console
+$ unzip flo-spring-cloud-dataflow-admin-1.0.0.M1.zip
+$ jar -u0vf spring-cloud-dataflow-admin-local-1.0.0.M2.jar lib
+```
+
+![image](https://cloud.githubusercontent.com/assets/106908/12847911/f53e749a-cc59-11e5-960d-a40134c4238f.png)
+
+
+![image](https://cloud.githubusercontent.com/assets/106908/12848563/19769b4a-cc5e-11e5-99f2-206f57c021db.png)
+
+
+![image](https://cloud.githubusercontent.com/assets/106908/12848588/4c098716-cc5e-11e5-83c9-856cbec0a492.png)
+
+
+![image](https://cloud.githubusercontent.com/assets/106908/12848884/d17d7dd4-cc5f-11e5-9494-da678bb203b0.png)
