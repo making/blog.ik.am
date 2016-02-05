@@ -178,3 +178,22 @@ Hello World1
 Hello World2
 Hello World3
 ```
+
+
+``` console
+dataflow:>stream create --name demo --definition "http --server.port=9000 | transform --expression=payload.toUpperCase() | file --directory=/tmp/out" --deploy
+Created and deployed new stream 'demo'
+```
+
+``` console
+$ curl -X POST -d "Hello World1" -H "Content-Type: text/plain" localhost:9000
+$ curl -X POST -d "Hello World2" -H "Content-Type: text/plain" localhost:9000
+$ curl -X POST -d "Hello World3" -H "Content-Type: text/plain" localhost:9000
+```
+
+``` console
+$ tail -f /tmp/out/file-sink 
+HELLO WORLD1
+HELLO WORLD2
+HELLO WORLD3
+```
