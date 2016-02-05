@@ -106,11 +106,11 @@ $ jps
 5244 spring-cloud-stream-module-launcher5520082976132501233.jar
 ```
 
-http://localhost:9393/admin-ui/index.html#/streams/definitions
+[http://localhost:9393/admin-ui/index.html#/streams/definitions](http://localhost:9393/admin-ui/index.html#/streams/definitions)
 
 ![image](https://cloud.githubusercontent.com/assets/106908/12841193/6104542e-cc2d-11e5-8745-5288b6e705bf.png)
 
-http://localhost:9393/admin-ui/index.html#/containers/containers
+[http://localhost:9393/admin-ui/index.html#/containers/containers](http://localhost:9393/admin-ui/index.html#/containers/containers)
 
 ![image](https://cloud.githubusercontent.com/assets/106908/12841206/757e2132-cc2d-11e5-8762-e60dfd244fcd.png)
 
