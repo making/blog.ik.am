@@ -245,7 +245,12 @@ Create a Redis service.
 
 ``` console
 $ cf create-service rediscloud 30mb scdf-redis
-($ cf create-service p-redis shared-vm scdf-redis) <-- in case of PCF
+```
+
+In case of MicroPCF,
+
+``` console
+$ cf create-service p-redis shared-vm scdf-redis) <-- in case of PCF
 ```
 
 Deploy Admin UI.
@@ -264,12 +269,35 @@ $ cf set-env scdf-admn CLOUDFOUNDRY_SKIP_SSL_VALIDATION false
 $ cf start scdf-admn
 ```
 
+In case of MicroPCF,
+
+``` console
+$ cf push scdf-admn -p spring-cloud-dataflow-admin-cloudfoundry-1.0.0.M1.jar --no-start
+$ cf bind-service scdf-admn scdf-redis
+$ cf set-env scdf-admn CLOUDFOUNDRY_API_ENDPOINT https://api.local.micropcf.io
+$ cf set-env scdf-admn CLOUDFOUNDRY_ORGANIZATION micropcf-org
+$ cf set-env scdf-admn CLOUDFOUNDRY_SPACE micropcf-space
+$ cf set-env scdf-admn CLOUDFOUNDRY_DOMAIN local.micropcf.io
+$ cf set-env scdf-admn CLOUDFOUNDRY_SERVICES scdf-redis
+$ cf set-env scdf-admn CLOUDFOUNDRY_USERNAME admin
+$ cf set-env scdf-admn CLOUDFOUNDRY_PASSWORD admin
+$ cf set-env scdf-admn CLOUDFOUNDRY_SKIP_SSL_VALIDATION true
+$ cf start scdf-admn
+```
+
 Access from shell
 
 ``` console
 server-unknown:>admin config server http://scdf-admn.cfapps.io
 Successfully targeted http://scdf-admn.cfapps.io
 ```
+In case of MicroPCF,
+
+``` console
+server-unknown:>admin config server http://scdf-admn.local.micropcf.io
+Successfully targeted http://scdf-admn.local.micropcf.io
+```
+
 
 Create a stream.
 
