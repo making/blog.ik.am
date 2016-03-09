@@ -238,7 +238,7 @@ Download Admin UI for Clound Foundry.
 
 ``` console
 $ wget http://repo.spring.io/milestone/org/springframework/cloud/spring-cloud-dataflow-admin-cloudfoundry/1.0.0.M1/spring-cloud-dataflow-admin-cloudfoundry-1.0.0.M1.jar
-($ jar -u0vf spring-cloud-dataflow-admin-cloudfoundry-1.0.0.M1.ja lib) <-- if needed
+($ jar -u0vf spring-cloud-dataflow-admin-cloudfoundry-1.0.0.M1.java lib) <-- if needed
 ```
 
 Create a Redis service.
@@ -247,42 +247,56 @@ Create a Redis service.
 $ cf create-service rediscloud 30mb scdf-redis
 ```
 
+In case of MicroPCF or PCF Dev,
+
+``` console
+($ cf create-service p-redis shared-vm scdf-redis) <-- in case of PCF
+```
+
+``` console
+cf push scdf-admn -p spring-cloud-dataflow-admin-cloudfoundry-1.0.0.M1.jar --no-start
+cf bind-service scdf-admn scdf-redis
+cf set-env scdf-admn CLOUDFOUNDRY_API_ENDPOINT https://api.run.pivotal.io
+cf set-env scdf-admn CLOUDFOUNDRY_ORGANIZATION {org}
+cf set-env scdf-admn CLOUDFOUNDRY_SPACE {space}
+cf set-env scdf-admn CLOUDFOUNDRY_DOMAIN cfapps.io
+cf set-env scdf-admn CLOUDFOUNDRY_SERVICES scdf-redis
+cf set-env scdf-admn CLOUDFOUNDRY_USERNAME {email}
+cf set-env scdf-admn CLOUDFOUNDRY_PASSWORD {password}
+cf set-env scdf-admn CLOUDFOUNDRY_SKIP_SSL_VALIDATION false
+cf start scdf-admn
+```
+
 In case of MicroPCF,
 
 ``` console
-$ cf create-service p-redis shared-vm scdf-redis) <-- in case of PCF
+cf push scdf-admn -p spring-cloud-dataflow-admin-cloudfoundry-1.0.0.M1.jar --no-start
+cf bind-service scdf-admn scdf-redis
+cf set-env scdf-admn CLOUDFOUNDRY_API_ENDPOINT https://api.local.micropcf.io
+cf set-env scdf-admn CLOUDFOUNDRY_ORGANIZATION micropcf-org
+cf set-env scdf-admn CLOUDFOUNDRY_SPACE micropcf-space
+cf set-env scdf-admn CLOUDFOUNDRY_DOMAIN local.micropcf.io
+cf set-env scdf-admn CLOUDFOUNDRY_SERVICES scdf-redis
+cf set-env scdf-admn CLOUDFOUNDRY_USERNAME admin
+cf set-env scdf-admn CLOUDFOUNDRY_PASSWORD admin
+cf set-env scdf-admn CLOUDFOUNDRY_SKIP_SSL_VALIDATION true
+cf start scdf-admn
 ```
 
-Deploy Admin UI.
+In case of PCF Dev,
 
 ``` console
-$ cf push scdf-admn -p spring-cloud-dataflow-admin-cloudfoundry-1.0.0.M1.jar --no-start
-$ cf bind-service scdf-admn scdf-redis
-$ cf set-env scdf-admn CLOUDFOUNDRY_API_ENDPOINT https://api.run.pivotal.io
-$ cf set-env scdf-admn CLOUDFOUNDRY_ORGANIZATION {org}
-$ cf set-env scdf-admn CLOUDFOUNDRY_SPACE {space}
-$ cf set-env scdf-admn CLOUDFOUNDRY_DOMAIN cfapps.io
-$ cf set-env scdf-admn CLOUDFOUNDRY_SERVICES scdf-redis
-$ cf set-env scdf-admn CLOUDFOUNDRY_USERNAME {email}
-$ cf set-env scdf-admn CLOUDFOUNDRY_PASSWORD {password}
-$ cf set-env scdf-admn CLOUDFOUNDRY_SKIP_SSL_VALIDATION false
-$ cf start scdf-admn
-```
-
-In case of MicroPCF,
-
-``` console
-$ cf push scdf-admn -p spring-cloud-dataflow-admin-cloudfoundry-1.0.0.M1.jar --no-start
-$ cf bind-service scdf-admn scdf-redis
-$ cf set-env scdf-admn CLOUDFOUNDRY_API_ENDPOINT https://api.local.micropcf.io
-$ cf set-env scdf-admn CLOUDFOUNDRY_ORGANIZATION micropcf-org
-$ cf set-env scdf-admn CLOUDFOUNDRY_SPACE micropcf-space
-$ cf set-env scdf-admn CLOUDFOUNDRY_DOMAIN local.micropcf.io
-$ cf set-env scdf-admn CLOUDFOUNDRY_SERVICES scdf-redis
-$ cf set-env scdf-admn CLOUDFOUNDRY_USERNAME admin
-$ cf set-env scdf-admn CLOUDFOUNDRY_PASSWORD admin
-$ cf set-env scdf-admn CLOUDFOUNDRY_SKIP_SSL_VALIDATION true
-$ cf start scdf-admn
+cf push scdf-admn -p spring-cloud-dataflow-admin-cloudfoundry-1.0.0.M1.jar --no-start
+cf bind-service scdf-admn scdf-redis
+cf set-env scdf-admn CLOUDFOUNDRY_API_ENDPOINT https://api.local.pcfdev.io
+cf set-env scdf-admn CLOUDFOUNDRY_ORGANIZATION pcfdev-org
+cf set-env scdf-admn CLOUDFOUNDRY_SPACE pcfdev-space
+cf set-env scdf-admn CLOUDFOUNDRY_DOMAIN local.pcfdev.io
+cf set-env scdf-admn CLOUDFOUNDRY_SERVICES scdf-redis
+cf set-env scdf-admn CLOUDFOUNDRY_USERNAME admin
+cf set-env scdf-admn CLOUDFOUNDRY_PASSWORD admin
+cf set-env scdf-admn CLOUDFOUNDRY_SKIP_SSL_VALIDATION true
+cf start scdf-admn
 ```
 
 Access from shell
@@ -298,6 +312,12 @@ server-unknown:>admin config server http://scdf-admn.local.micropcf.io
 Successfully targeted http://scdf-admn.local.micropcf.io
 ```
 
+In case of PCF Dev,
+
+``` console
+server-unknown:>admin config server http://scdf-admn.local.pcfdev.io
+Successfully targeted http://scdf-admn.local.pcfdev.io
+```
 
 Create a stream.
 
